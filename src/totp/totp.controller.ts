@@ -1,4 +1,5 @@
-import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import * as QRCode from 'qrcode';
 import * as qrcodeTerminal from 'qrcode-terminal';
 import { TotpService } from './totp.service';
@@ -27,6 +28,7 @@ export class TotpController {
     }
 
     @Post('verify')
+    @UseGuards(ThrottlerGuard)
     async verify(@Body() body: { email: string; token: string }) {
         const { email, token } = body;
 
