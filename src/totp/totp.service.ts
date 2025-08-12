@@ -5,9 +5,12 @@ import { authenticator } from 'otplib';
 export class TotpService {
     generateSecret(email: string) {
         const secret = authenticator.generateSecret();
-
         const otpauth = authenticator.keyuri(email, 'nest-totp-service', secret);
 
         return { secret, otpauth };
+    }
+
+    verifyToken(secret: string, token: string): boolean {
+        return authenticator.check(token, secret);
     }
 }

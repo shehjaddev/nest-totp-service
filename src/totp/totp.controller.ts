@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post } from '@nestjs/common';
 import * as QRCode from 'qrcode';
 import * as qrcodeTerminal from 'qrcode-terminal';
 import { TotpService } from './totp.service';
@@ -24,5 +24,21 @@ export class TotpController {
         });
 
         return { secret, otpauth, qrCodeDataURL };
+    }
+
+    @Post('verify')
+    verify(@Body() body: { secret: string; token: string }) {
+        const { secret, token } = body;
+
+        if (!secret || !token) {
+            throw new BadRequestException('Missing secret or token');
+        }
+
+        const isValid = this.totpService.verifyToken(secret, token);
+        if (!isValid) {
+            throw new BadRequestException('Invalid token');
+        }
+
+        return { verified: true };
     }
 }
