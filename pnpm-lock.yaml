@@ -29,6 +29,9 @@ importers:
       qrcode:
         specifier: ^1.5.4
         version: 1.5.4
+      qrcode-terminal:
+        specifier: ^0.12.0
+        version: 0.12.0
       reflect-metadata:
         specifier: ^0.2.2
         version: 0.2.2
@@ -2890,6 +2893,10 @@ packages:
 
   pure-rand@6.1.0:
     resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
+
+  qrcode-terminal@0.12.0:
+    resolution: {integrity: sha512-EXtzRZmC+YGmGlDFbXKxQiMZNwCLEO6BANKXG4iCtSIM0yqc/pappSx3RIKr4r0uh5JsBckOXeKrB3Iz7mdQpQ==}
+    hasBin: true
 
   qrcode@1.5.4:
     resolution: {integrity: sha512-1ca71Zgiu6ORjHqFBDpnSMTR2ReToX4l1Au1VFLyVeBTFavzQnv5JxMFr3ukHVKpSrSA2MCk0lNJSykjUfz7Zg==}
@@ -6768,6 +6775,8 @@ snapshots:
   punycode@2.3.1: {}
 
   pure-rand@6.1.0: {}
+
+  qrcode-terminal@0.12.0: {}
 
   qrcode@1.5.4:
     dependencies:
