@@ -14,7 +14,7 @@ export class TotpController {
 
     @Post('setup')
     async setup(@Body('email') email: string) {
-        const { secret, otpauth } = this.totpService.generateSecret(email);
+        const { secret, otpauth } = await this.totpService.generateSecret(email);
 
         const qrCodeDataURL = await QRCode.toDataURL(otpauth);
 
@@ -27,14 +27,14 @@ export class TotpController {
     }
 
     @Post('verify')
-    verify(@Body() body: { secret: string; token: string }) {
-        const { secret, token } = body;
+    async verify(@Body() body: { email: string; token: string }) {
+        const { email, token } = body;
 
-        if (!secret || !token) {
-            throw new BadRequestException('Missing secret or token');
+        if (!email || !token) {
+            throw new BadRequestException('Missing email or token');
         }
 
-        const isValid = this.totpService.verifyToken(secret, token);
+        const isValid = await this.totpService.verifyToken(email, token);
         if (!isValid) {
             throw new BadRequestException('Invalid token');
         }
