@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
 import * as CryptoJS from 'crypto-js';
@@ -7,6 +7,7 @@ import { authenticator } from 'otplib';
 @Injectable()
 export class TotpService {
     private encryptionKey: string;
+    private readonly logger = new Logger(TotpService.name);
 
     constructor(private prisma: PrismaClient, private configService: ConfigService) {
         const key = this.configService.get<string>('TOTP_ENCRYPTION_KEY');
@@ -38,17 +39,33 @@ export class TotpService {
     }
 
     async verifyToken(email: string, token: string): Promise<boolean> {
+        this.logger.log(`Verifying token for email: ${email}`);
+
         const user = await this.prisma.user.findUnique({ where: { email } });
-        if (!user) return false;
+        if (!user) {
+            this.logger.warn(`User not found: ${email}`);
+            return false;
+        }
 
         const totpSecret = await this.prisma.tOTPSecret.findUnique({
             where: { userId: user.id },
         });
 
-        if (!totpSecret || !totpSecret.enabled) return false;
+        if (!totpSecret || !totpSecret.enabled) {
+            this.logger.warn(`TOTP secret missing or disabled for user: ${email}`);
+            return false;
+        }
 
         const decryptedSecret = this.decryptSecret(totpSecret.secret);
-        return authenticator.check(token, decryptedSecret);
+        const isValid = authenticator.check(token, decryptedSecret);
+
+        if (isValid) {
+            this.logger.log(`Token valid for user: ${email}`);
+        } else {
+            this.logger.warn(`Invalid token attempt for user: ${email}`);
+        }
+
+        return isValid;
     }
 
     encryptSecret(secret: string): string {
